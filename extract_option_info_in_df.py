@@ -36,10 +36,16 @@ def extract_option_info_in_df(strike_info,
     #  step-functional setup
     # ========================================
     access_token,api_key=get_kite_secret()
-    kite = KiteConnect(api_key=api_key)
-    kite.set_access_token(access_token)
-    kite_quote=kite.quote(strike_token)
     
+    try:
+       kite = KiteConnect(api_key=api_key)
+       kite.set_access_token(access_token)
+       kite_quote=kite.quote(strike_token)
+    except:
+        time.sleep(150)
+        kite = KiteConnect(api_key=api_key)
+        kite.set_access_token(access_token)
+    # print(kite_quote)
     for i in range(first_strike_consideration_value,last_strike_consideration_value,50):
         # strike.append(i)
         if int(i)==int(atm_value):
@@ -96,6 +102,9 @@ def extract_option_info_in_df(strike_info,
         total_pcr_value=round(float(strike_info["pe_oi"])/float(strike_info["ce_oi"]),2)
         strike_info["total_pcr"]=str(total_pcr_value)
         import shared_variable
+        key = str(i)
+        if key not in shared_variable.dictionary_df:
+           shared_variable.dictionary_df[key] = pd.DataFrame(columns=strike_info.keys())
         shared_variable.dictionary_df[str(i)]=pd.concat([shared_variable.dictionary_df[str(i)],pd.DataFrame([strike_info])],ignore_index=True)
     return shared_variable.dictionary_df,nifty_50_last_price["nifty_value"]
 # def create_df_for_strike_info(strike_info):

@@ -2,6 +2,7 @@ from get_token_of_script import get_token_of_script
 from get_kite_secret import get_kite_secret
 import pandas as pd
 from kiteconnect import KiteConnect
+import time
 def get_nifty50_value(df_eq:pd.DataFrame):
     # =========================
     # step-get value of nifty 
@@ -13,10 +14,18 @@ def get_nifty50_value(df_eq:pd.DataFrame):
     # step-get nifty value
     # ===========================
     access_token,api_key=get_kite_secret()
-    kite = KiteConnect(api_key=api_key)
-    kite.set_access_token(access_token)
-    nifty_50_quote=kite.quote([nifty_50_token])
-    nifty_50_last_price=nifty_50_quote[f"{nifty_50_token}"]["last_price"]
+    
+    try:
+      kite = KiteConnect(api_key=api_key)
+      kite.set_access_token(access_token)
+      nifty_50_quote=kite.quote([nifty_50_token])
+      nifty_50_last_price=nifty_50_quote[f"{nifty_50_token}"]["last_price"]
+    except:
+      kite = KiteConnect(api_key=api_key)
+      kite.set_access_token(access_token)
+      nifty_50_quote=kite.quote([nifty_50_token])
+      nifty_50_last_price=nifty_50_quote[f"{nifty_50_token}"]["last_price"]
+      
     # print("nifty_50_last_price=",nifty_50_last_price) 
     # roundup_nifty_50_lp=round(nifty_50_last_price,None)
     return {"nifty_value":str(nifty_50_last_price),"nifty_token":str(nifty_50_token)}
